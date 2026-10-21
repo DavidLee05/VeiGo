@@ -1,0 +1,198 @@
+services:
+  postgres:
+    build:
+      context: ./postgres
+      dockerfile: Dockerfile
+    env_file:
+      - ../.env
+    environment:
+      POSTGRES_DB: veigo
+      POSTGRES_USER: veigo_admin
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Copy .env.example to .env and set POSTGRES_PASSWORD}
+    ports:
+      - "127.0.0.1:${POSTGRES_HOST_PORT:-5433}:5432"
+    volumes:
+      - veigo-postgres-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U veigo_admin -d veigo"]
+      interval: 5s
+      timeout: 5s
+      retries: 12
+
+  user-service:
+    build:
+      context: ../backend
+      dockerfile: Dockerfile
+      args:
+        SERVICE_PROJECT: services/VeiGo.UserService/VeiGo.UserService.csproj
+        SERVICE_DLL: VeiGo.UserService.dll
+    environment:
+      ASPNETCORE_URLS: http://+:8080
+      ConnectionStrings__Postgres: Host=postgres;Database=veigo;Username=veigo_user;Password=${USER_DB_PASSWORD};Search Path=user
+    depends_on:
+      postgres:
+        condition: service_healthy
+    ports:
+      - "127.0.0.1:5201:8080"
+
+  catalog-service:
+    build:
+      context: ../backend
+      dockerfile: Dockerfile
+      args:
+        SERVICE_PROJECT: services/VeiGo.CatalogService/VeiGo.CatalogService.csproj
+        SERVICE_DLL: VeiGo.CatalogService.dll
+    environment:
+      ASPNETCORE_URLS: http://+:8080
+      ConnectionStrings__Postgres: Host=postgres;Database=veigo;Username=veigo_catalog;Password=${CATALOG_DB_PASSWORD};Search Path=catalog
+    depends_on:
+      postgres:
+        condition: service_healthy
+    ports:
+      - "127.0.0.1:5202:8080"
+
+  search-service:
+    build:
+      context: ../backend
+      dockerfile: Dockerfile
+      args:
+        SERVICE_PROJECT: services/VeiGo.SearchService/VeiGo.SearchService.csproj
+        SERVICE_DLL: VeiGo.SearchService.dll
+    environment:
+      ASPNETCORE_URLS: http://+:8080
+      ConnectionStrings__Postgres: Host=postgres;Database=veigo;Username=veigo_search;Password=${SEARCH_DB_PASSWORD};Search Path=search
+    depends_on:
+      postgres:
+        condition: service_healthy
+    ports:
+      - "127.0.0.1:5203:8080"
+
+  booking-service:
+    build:
+      context: ../backend
+      dockerfile: Dockerfile
+      args:
+        SERVICE_PROJECT: services/VeiGo.BookingService/VeiGo.BookingService.csproj
+        SERVICE_DLL: VeiGo.BookingService.dll
+    environment:
+      ASPNETCORE_URLS: http://+:8080
+      ConnectionStrings__Postgres: Host=postgres;Database=veigo;Username=veigo_booking;Password=${BOOKING_DB_PASSWORD};Search Path=booking
+    depends_on:
+      postgres:
+        condition: service_healthy
+    ports:
+      - "127.0.0.1:5204:8080"
+
+  payment-service:
+    build:
+      context: ../backend
+      dockerfile: Dockerfile
+      args:
+        SERVICE_PROJECT: services/VeiGo.PaymentService/VeiGo.PaymentService.csproj
+        SERVICE_DLL: VeiGo.PaymentService.dll
+    environment:
+      ASPNETCORE_URLS: http://+:8080
+      ConnectionStrings__Postgres: Host=postgres;Database=veigo;Username=veigo_payment;Password=${PAYMENT_DB_PASSWORD};Search Path=payment
+    depends_on:
+      postgres:
+        condition: service_healthy
+    ports:
+      - "127.0.0.1:5205:8080"
+
+  dealer-service:
+    build:
+      context: ../backend
+      dockerfile: Dockerfile
+      args:
+        SERVICE_PROJECT: services/VeiGo.DealerService/VeiGo.DealerService.csproj
+        SERVICE_DLL: VeiGo.DealerService.dll
+    environment:
+      ASPNETCORE_URLS: http://+:8080
+      ConnectionStrings__Postgres: Host=postgres;Database=veigo;Username=veigo_dealer;Password=${DEALER_DB_PASSWORD};Search Path=dealer
+    depends_on:
+      postgres:
+        condition: service_healthy
+    ports:
+      - "127.0.0.1:5206:8080"
+
+  inventory-service:
+    build:
+      context: ../backend
+      dockerfile: Dockerfile
+      args:
+        SERVICE_PROJECT: services/VeiGo.InventoryService/VeiGo.InventoryService.csproj
+        SERVICE_DLL: VeiGo.InventoryService.dll
+    environment:
+      ASPNETCORE_URLS: http://+:8080
+      ConnectionStrings__Postgres: Host=postgres;Database=veigo;Username=veigo_inventory;Password=${INVENTORY_DB_PASSWORD};Search Path=inventory
+    depends_on:
+      postgres:
+        condition: service_healthy
+    ports:
+      - "127.0.0.1:5207:8080"
+
+  rental-service:
+    build:
+      context: ../backend
+      dockerfile: Dockerfile
+      args:
+        SERVICE_PROJECT: services/VeiGo.RentalService/VeiGo.RentalService.csproj
+        SERVICE_DLL: VeiGo.RentalService.dll
+    environment:
+      ASPNETCORE_URLS: http://+:8080
+      ConnectionStrings__Postgres: Host=postgres;Database=veigo;Username=veigo_rental;Password=${RENTAL_DB_PASSWORD};Search Path=rental
+    depends_on:
+      postgres:
+        condition: service_healthy
+    ports:
+      - "127.0.0.1:5208:8080"
+
+  notification-service:
+    build:
+      context: ../backend
+      dockerfile: Dockerfile
+      args:
+        SERVICE_PROJECT: services/VeiGo.NotificationService/VeiGo.NotificationService.csproj
+        SERVICE_DLL: VeiGo.NotificationService.dll
+    environment:
+      ASPNETCORE_URLS: http://+:8080
+      ConnectionStrings__Postgres: Host=postgres;Database=veigo;Username=veigo_notification;Password=${NOTIFICATION_DB_PASSWORD};Search Path=notification
+    depends_on:
+      postgres:
+        condition: service_healthy
+    ports:
+      - "127.0.0.1:5209:8080"
+
+  gateway:
+    build:
+      context: ../backend
+      dockerfile: Dockerfile
+      args:
+        SERVICE_PROJECT: gateway/VeiGo.Gateway/VeiGo.Gateway.csproj
+        SERVICE_DLL: VeiGo.Gateway.dll
+    environment:
+      ASPNETCORE_URLS: http://+:8080
+      ReverseProxy__Clusters__user__Destinations__default__Address: http://user-service:8080/
+      ReverseProxy__Clusters__catalog__Destinations__default__Address: http://catalog-service:8080/
+      ReverseProxy__Clusters__search__Destinations__default__Address: http://search-service:8080/
+      ReverseProxy__Clusters__booking__Destinations__default__Address: http://booking-service:8080/
+      ReverseProxy__Clusters__payment__Destinations__default__Address: http://payment-service:8080/
+      ReverseProxy__Clusters__dealer__Destinations__default__Address: http://dealer-service:8080/
+      ReverseProxy__Clusters__inventory__Destinations__default__Address: http://inventory-service:8080/
+      ReverseProxy__Clusters__rental__Destinations__default__Address: http://rental-service:8080/
+      ReverseProxy__Clusters__notification__Destinations__default__Address: http://notification-service:8080/
+    depends_on:
+      - user-service
+      - catalog-service
+      - search-service
+      - booking-service
+      - payment-service
+      - dealer-service
+      - inventory-service
+      - rental-service
+      - notification-service
+    ports:
+      - "127.0.0.1:5100:8080"
+
+volumes:
+  veigo-postgres-data:

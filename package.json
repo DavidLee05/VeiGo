@@ -1,24 +1,20 @@
 {
-  "name": "veigo",
+  "name": "veigo-monorepo",
   "version": "0.1.0",
   "private": true,
+  "workspaces": [
+    "frontend"
+  ],
   "scripts": {
-    "dev": "next dev",
-    "build": "next build",
-    "start": "next start",
-    "lint": "eslint"
-  },
-  "dependencies": {
-    "next": "16.4.2",
-    "react": "19.3.0",
-    "react-dom": "19.3.0"
-  },
-  "devDependencies": {
-    "@types/node": "^20",
-    "@types/react": "^19",
-    "@types/react-dom": "^19",
-    "eslint": "^9",
-    "eslint-config-next": "16.4.2",
-    "typescript": "^5"
+    "dev": "npm run dev --workspace frontend",
+    "build": "npm run build --workspace frontend",
+    "lint": "npm run lint --workspace frontend",
+    "typecheck": "npm run typecheck --workspace frontend",
+    "dev:gateway": "dotnet run --project backend/gateway/VeiGo.Gateway/VeiGo.Gateway.csproj",
+    "backend:restore": "dotnet restore backend/VeiGo.sln",
+    "backend:build": "dotnet build backend/VeiGo.sln --no-restore",
+    "compose:up": "docker compose --env-file .env -f infra/docker-compose.yml up --build -d",
+    "compose:down": "docker compose --env-file .env -f infra/docker-compose.yml down --remove-orphans",
+    "compose:logs": "docker compose --env-file .env -f infra/docker-compose.yml logs --follow"
   }
 }
