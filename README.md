@@ -1,36 +1,49 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# VeiGo
 
-## Getting Started
+VeiGo is a Vietnamese motorcycle marketplace concept for discovering used bikes
+to buy or rent. This first slice is a responsive Next.js storefront with sample
+listing data; authentication, listing details, booking, payments, and persistence
+are not implemented yet.
 
-First, run the development server:
+## Design direction
 
-```bash
+- **Typography:** Be Vietnam Pro, chosen for legible Vietnamese diacritics and a
+  contemporary, approachable marketplace feel.
+- **Palette:** deep teal for confidence and primary actions; warm ivory for the
+  canvas; muted amber for small accents and emphasis.
+- **Layout:** editorial hero, focused search panel, photo-led listing cards, and
+  a restrained information hierarchy across desktop and mobile.
+- **Interaction:** buy/rent switch, text/brand/location/category/budget filters,
+  saved-listing toggles, and an explicit no-results state.
+
+## Run locally
+
+Requirements: Node.js 20.9 or later and npm.
+
+```powershell
+npm install
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open <http://localhost:3000>.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Checks
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```powershell
+npm run lint
+npx tsc --noEmit
+npm run build
+```
 
-## Learn More
+## Deploy to Vercel
 
-To learn more about Next.js, take a look at the following resources:
+Import `DavidLee05/VeiGo` in Vercel and deploy the repository root. No environment
+variables are needed for this static sample-data storefront.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Current scope
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+- Frontend scaffold: Next.js App Router, React, and TypeScript.
+- Listing content is local demonstration data in `src/lib/vehicles.ts`.
+- Motorcycle imagery is served from Unsplash and optimized with `next/image`.
+- The repository is linked locally to `https://github.com/DavidLee05/VeiGo.git`.
+- No commit has been created and no code has been pushed to GitHub.
